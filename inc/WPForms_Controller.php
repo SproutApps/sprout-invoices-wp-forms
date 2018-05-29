@@ -39,7 +39,7 @@ class SI_WPForms_Controller extends SI_Controller {
 		$args = apply_filters( 'si_estimate_submmissions_args', $args );
 		$estimate_id = SI_Estimate::create_estimate( $args );
 		$estimate = SI_Estimate::get_instance( $estimate_id );
-		do_action( 'estimate_submitted_from_adv_form', $estimate, $args );
+		do_action( 'si_estimate_submitted_from_adv_form', $estimate, $args );
 		if ( isset( $args['line_item_list'] ) && ! empty( $args['line_item_list'] ) ) {
 			$line_items = array();
 			foreach ( $args['line_item_list'] as $item_id ) {
@@ -71,7 +71,7 @@ class SI_WPForms_Controller extends SI_Controller {
 			0,
 		false );
 
-		do_action( 'si_estimate_submitted_from_adv_form', $estimate, $args );
+		do_action( 'si_estimate_submitted_from_adv_form_complete', $estimate, $args );
 		return $estimate;
 	}
 
@@ -86,7 +86,7 @@ class SI_WPForms_Controller extends SI_Controller {
 		$args = apply_filters( 'si_invoice_submmissions_args', $args );
 		$invoice_id = SI_Invoice::create_invoice( $args );
 		$invoice = SI_Invoice::get_instance( $invoice_id );
-		do_action( 'invoice_submitted_from_adv_form', $invoice, $args );
+		do_action( 'si_invoice_submitted_from_adv_form', $invoice, $args );
 		if ( isset( $args['line_item_list'] ) && ! empty( $args['line_item_list'] ) ) {
 			$line_items = array();
 			foreach ( $args['line_item_list'] as $item_id ) {
@@ -118,7 +118,7 @@ class SI_WPForms_Controller extends SI_Controller {
 			0,
 		false );
 
-		do_action( 'si_invoice_submitted_from_adv_form', $invoice, $args );
+		do_action( 'si_invoice_submitted_from_adv_form_complete', $invoice, $args );
 		return $invoice;
 	}
 
