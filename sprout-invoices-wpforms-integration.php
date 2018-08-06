@@ -1,11 +1,11 @@
 <?php if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /*
- * Plugin Name: Sprout Invoices + WP Forms
+ * Plugin Name: Sprout Invoices + WPForms
  * Plugin URI: https://sproutapps.co/sprout-invoices/integrations/
  * Description: Allows for a form submitted by WP Forms to create all necessary records to send your client an invoice or estimate.
  * Author: Sprout Apps
- * Version: 1.0.1
+ * Version: 1.2
  * Author URI: https://sproutapps.co
  * Text Domain: sprout-invoices
  * Domain Path: languages

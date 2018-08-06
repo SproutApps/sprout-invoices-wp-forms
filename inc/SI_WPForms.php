@@ -12,10 +12,11 @@ class SI_WPForms extends SI_WPForms_Controller {
 		self::$wpforms_form_id = get_option( self::WPFORMS_FORM_ID, 0 );
 		self::$generation = get_option( self::GENERATION, 'estimate' );
 
-		add_filter( 'si_add_options', array( __CLASS__, 'remove_integration_addon_option' ) );
+		add_filter( 'si_settings_options', array( __CLASS__, 'add_settings_options' ) );
 
-		// filter options
-		self::register_settings();
+		add_action( 'si_settings_saved', array( get_class(), 'save_mappings' ) );
+
+		add_filter( 'si_settings', array( __CLASS__, 'register_settings' ) );
 
 		if ( self::$wpforms_form_id ) {
 			// Create invoice before confirmation
@@ -27,13 +28,11 @@ class SI_WPForms extends SI_WPForms_Controller {
 	// Settings //
 	///////////////
 
-	public static function remove_integration_addon_option( $options = array() ) {
-		// remove the integration addon ad
-		unset( $options['settings']['estimate_submissions'] );
-		return $options;
-	}
+	public static function register_settings( $settings = array() ) {
 
-	public static function register_settings() {
+		if ( ! function_exists( 'wpforms' ) ) {
+			return;
+		}
 
 		$wpforms_options = array( 0 => __( 'No forms found', 'sprout-invoices' ) );
 		$forms = wpforms()->form->get( '', array(
@@ -46,74 +45,68 @@ class SI_WPForms extends SI_WPForms_Controller {
 			}
 		}
 
-		$settings = array(
-			self::WPFORMS_FORM_ID => array(
-				'label' => __( 'WP Form', 'sprout-invoices' ),
-				'option' => array(
-					'type' => 'select',
-					'options' => $wpforms_options,
-					'default' => self::$wpforms_form_id,
-					'description' => sprintf( __( 'Select the submission form built with <a href="%s">WP Forms</a>.', 'sprout-invoices' ), 'https://sproutapps.co/link/wpforms-forms' ),
-				),
-			),
-			self::GENERATION => array(
-				'label' => __( 'Submission Records', 'sprout-invoices' ),
-				'option' => array(
-					'type' => 'select',
-					'options' => array( 'estimate' => __( 'Estimate', 'sprout-invoices' ), 'invoice' => __( 'Invoice', 'sprout-invoices' ), 'client' => __( 'Client Only', 'sprout-invoices' ) ),
-					'default' => self::$generation,
-					'description' => __( 'Select the type of records you would like to be created. Note: estimates and invoices create client records.', 'sprout-invoices' ),
-				),
-			),
-			self::FORM_ID_MAPPING => array(
-				'label' => __( 'WP Forms ID Mapping', 'sprout-invoices' ),
-				'option' => array( __CLASS__, 'show_form_field_mapping' ),
-				'sanitize_callback' => array( __CLASS__, 'save_wpforms_form_field_mapping' ),
-			),
-		);
-
-		$all_settings = array(
-			'form_submissions' => array(
-				'title' => __( 'WP Forms Submissions', 'sprout-invoices' ),
+		$settings['wpforms_integration'] = array(
+			'title' => __( 'WP Forms Submissions', 'sprout-invoices' ),
 				'weight' => 6,
-				'tab' => 'settings',
-				'settings' => $settings,
-			),
+				'tab' => 'addons',
+				'description' => sprintf( __( 'Refer to <a href="%s">this documentation</a> if you are unsure about these settings.', 'sprout-invoices' ), 'https://docs.sproutapps.co/article/8-integrating-gravity-forms-ninja-forms-or-custom-estimate-submissions' ),
+				'settings' => array(
+					self::WPFORMS_FORM_ID => array(
+						'label' => __( 'WP Form', 'sprout-invoices' ),
+						'option' => array(
+							'type' => 'select',
+							'options' => $wpforms_options,
+							'default' => self::$wpforms_form_id,
+							'description' => sprintf( __( 'Select the submission form built with <a href="%s">WP Forms</a>.', 'sprout-invoices' ), 'https://sproutapps.co/link/wpforms-forms' ),
+						),
+					),
+					self::GENERATION => array(
+						'label' => __( 'Submission Records', 'sprout-invoices' ),
+						'option' => array(
+							'type' => 'select',
+							'options' => array( 'estimate' => __( 'Estimate', 'sprout-invoices' ), 'invoice' => __( 'Invoice', 'sprout-invoices' ), 'client' => __( 'Client Only', 'sprout-invoices' ) ),
+							'default' => self::$generation,
+							'description' => __( 'Select the type of records you would like to be created. Note: estimates and invoices create client records.', 'sprout-invoices' ),
+						),
+					),
+					self::FORM_ID_MAPPING => array(
+						'label' => __( 'WP Forms ID Mapping', 'sprout-invoices' ),
+						'option' => array( __CLASS__, 'show_form_field_mapping' ),
+					),
+				),
 		);
 
-		do_action( 'sprout_settings', $all_settings );
+		return $settings;
 	}
 
-	public static function show_form_field_mapping() {
-		$mappings = array(
-			'subject' => isset( self::$form_mapping['subject'] ) ? self::$form_mapping['subject'] : '',
-			'requirements' => isset( self::$form_mapping['requirements'] ) ? self::$form_mapping['requirements'] : '',
-			'email' => isset( self::$form_mapping['email'] ) ? self::$form_mapping['email'] : '',
-			'client_name' => isset( self::$form_mapping['client_name'] ) ? self::$form_mapping['client_name'] : '',
-			'first_name' => isset( self::$form_mapping['first_name'] ) ? self::$form_mapping['first_name'] : '',
-			'last_name' => isset( self::$form_mapping['last_name'] ) ? self::$form_mapping['last_name'] : '',
-			'full_name' => isset( self::$form_mapping['full_name'] ) ? self::$form_mapping['full_name'] : '',
-			'website' => isset( self::$form_mapping['website'] ) ? self::$form_mapping['website'] : '',
-			'contact_address' => isset( self::$form_mapping['contact_address'] ) ? self::$form_mapping['contact_address'] : '',
-			'contact_street' => isset( self::$form_mapping['contact_street'] ) ? self::$form_mapping['contact_street'] : '',
-			'contact_city' => isset( self::$form_mapping['contact_city'] ) ? self::$form_mapping['contact_city'] : '',
-			'contact_zone' => isset( self::$form_mapping['contact_zone'] ) ? self::$form_mapping['contact_zone'] : '',
-			'contact_postal_code' => isset( self::$form_mapping['contact_postal_code'] ) ? self::$form_mapping['contact_postal_code'] : '',
-			'contact_country' => isset( self::$form_mapping['contact_country'] ) ? self::$form_mapping['contact_country'] : '',
-		);
-		self::wpforms_options( $mappings );
+	public static function add_settings_options( $options = array() ) {
+		$save_options = array();
+		$form_mapping_options = get_option( self::FORM_ID_MAPPING, array() );
+		$mapping_options = self::mapping_options();
+		foreach ( $mapping_options as $key => $title ) {
+			$value = ( isset( $form_mapping_options[ $key ] ) ) ? $form_mapping_options[ $key ] : '' ;
+			$save_options[ SI_Settings_API::_sanitize_input_for_vue( 'si_invoice_sub_mapping_' . $key ) ] = $value;
+		}
+		return array_merge( $save_options, $options );
 	}
 
-	public static function wpforms_options( $mappings = array() ) {
-		$form = wpforms()->form->get( self::$wpforms_form_id );
-		if ( empty( $form ) ) {
-			printf( '<p class="description">%s</p>', __( 'Select the form and save before mapping the inputs.', 'sprout-invoices' ) );
+	public static function show_form_field_mapping( $fields = array() ) {
+		$fields = self::mapping_options();
+		foreach ( $fields as $name => $label ) {
+			$value = ( isset( self::$form_mapping[ $name ] ) ) ? self::$form_mapping[ $name ] : '' ;
+			printf( '<label><input v-model="vm.si_invoice_sub_mapping_%4$s" type="text" name="si_invoice_sub_mapping_%1$s" id="si_invoice_sub_mapping_%1$s" value="%3$s" size="2"> %2$s</label><br/>', $name, $label, $value, SI_Settings_API::_sanitize_input_for_vue( $name ) );
 		}
-		print '<p>';
-		foreach ( self::mapping_options() as $key => $label ) {
-			printf( '<label>%1$s %2$s</label><br/>', self::wpforms_forms_select_options( $key, $mappings[ $key ] ), $label );
+
+		printf( '<p class="description">%s</p>', __( 'Map the field IDs of your form to the data name.', 'sprout-invoices' ) );
+	}
+
+	public static function save_mappings() {
+		$mappings = array();
+		$fields = self::mapping_options();
+		foreach ( $fields as $key => $label ) {
+			$mappings[ $key ] = isset( $_POST[ 'si_invoice_sub_mapping_' . $key ] ) ? $_POST[ 'si_invoice_sub_mapping_' . $key ] : '';
 		}
-		print '</p>';
+		update_option( self::FORM_ID_MAPPING, $mappings );
 	}
 
 	public static function mapping_options() {
@@ -130,27 +123,6 @@ class SI_WPForms extends SI_WPForms_Controller {
 		return $options;
 	}
 
-	public static function wpforms_forms_select_options( $input_name = '', $selected = 0 ) {
-		$form = wpforms()->form->get( self::$wpforms_form_id );
-		$fields = wpforms_get_form_fields( $form );
-		if ( empty( $fields ) ) {
-			return '<code>&nbsp;&nbsp;&nbsp;</code>';
-		}
-		$option = sprintf( '<select type="select" name="sa_form_map_%s"><option></option>', $input_name );
-		foreach ( $fields as $key => $field ) {
-			$option .= sprintf( '<option value="%s" %s>%s (%s)</option>', $field['id'], selected( $selected, $field['id'], false ), $field['label'], $field['type'] );
-		}
-		$option .= '</select>';
-		return $option;
-	}
-
-	public static function save_wpforms_form_field_mapping() {
-		$mappings = array();
-		foreach ( self::mapping_options() as $name => $label ) {
-			$mappings[ $name ] = isset( $_POST[ 'sa_form_map_'.$name ] ) ? $_POST[ 'sa_form_map_'.$name ] : '';
-		}
-		return $mappings;
-	}
 
 	////////////////////
 	// Process forms //
