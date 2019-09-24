@@ -209,11 +209,11 @@ class SI_WPForms extends SI_WPForms_Controller {
 			'client_name' => $client_name,
 			'full_name' => $full_name,
 			'website' => $website,
-			'contact_street' => $address['contact_street'],
-			'contact_city' => $address['contact_city'],
-			'contact_zone' => $address['contact_zone'],
-			'contact_postal_code' => $address['contact_postal_code'],
-			'contact_country' => $address['contact_country'],
+			'contact_street' => isset( $address['contact_street'] ) ? $address['contact_street'] : '',
+			'contact_city' => isset( $address['contact_city'] ) ? $address['contact_city'] : '',
+			'contact_zone' => isset( $address['contact_zone'] ) ? $address['contact_zone'] : '',
+			'contact_postal_code' => isset( $address['contact_postal_code'] ) ? $address['contact_postal_code'] : '',
+			'contact_country' => isset( $address['contact_country'] ) ? $address['contact_country'] : '',
 		);
 
 		if ( 'estimate' === self::$generation ) {

@@ -35,6 +35,9 @@ class SI_WPForms_Controller extends SI_Controller {
 		if ( ! isset( $args['status'] ) ) {
 			$args['status'] = SI_Estimate::STATUS_PENDING;
 		}
+
+		do_action( 'si_doc_generation_start' );
+
 		// Create invoice
 		$args = apply_filters( 'si_estimate_submmissions_args', $args );
 		$estimate_id = SI_Estimate::create_estimate( $args );
@@ -82,6 +85,9 @@ class SI_WPForms_Controller extends SI_Controller {
 		if ( ! isset( $args['status'] ) ) {
 			$args['status'] = SI_Invoice::STATUS_PENDING;
 		}
+
+		do_action( 'si_doc_generation_start' );
+
 		// Create invoice
 		$args = apply_filters( 'si_invoice_submmissions_args', $args );
 		$invoice_id = SI_Invoice::create_invoice( $args );
