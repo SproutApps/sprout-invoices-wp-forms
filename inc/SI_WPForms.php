@@ -18,15 +18,34 @@ class SI_WPForms extends SI_WPForms_Controller {
 
 		add_filter( 'si_settings', array( __CLASS__, 'register_settings' ) );
 
+		// plugin menu
+		add_filter( 'plugin_action_links', array( __CLASS__, 'plugin_action_links' ), 10, 2 );
+
 		if ( self::$wpforms_form_id ) {
 			// Create invoice before confirmation
 			add_action( 'wpforms_process_complete', array( __CLASS__, 'maybe_process_wpforms_form' ), 10, 4 );
 		}
 	}
 
-	///////////////
-	// Settings //
-	///////////////
+	/**
+	 * Add settings link to the plugin actions.
+	 *
+	 * @param  array  $actions Plugin actions.
+	 * @param  string $plugin_file Path to the plugin file.
+	 * @return array
+	 */
+
+	public static function plugin_action_links( $actions, $plugin_file ) {
+		static $si_wp_forms;
+		if ( ! isset( $plugin ) ) {
+			$si_wp_forms = plugin_basename( SI_WP_FORMS_PLUGIN_FILE );
+		}
+		if ( $si_wp_forms === $plugin_file ) {
+			$settings = array( 'settings' => '<a href="admin.php?page=sprout-invoices-addons#addons">' . __( 'Settings', 'General' ) . '</a>' );
+			$actions  = array_merge( $settings, $actions );
+		}
+		return $actions;
+	}
 
 	public static function register_settings( $settings = array() ) {
 
@@ -94,7 +113,7 @@ class SI_WPForms extends SI_WPForms_Controller {
 		$fields = self::mapping_options();
 		foreach ( $fields as $name => $label ) {
 			$value = ( isset( self::$form_mapping[ $name ] ) ) ? self::$form_mapping[ $name ] : '' ;
-			printf( '<label><input v-model="vm.si_invoice_sub_mapping_%4$s" type="text" name="si_invoice_sub_mapping_%1$s" id="si_invoice_sub_mapping_%1$s" value="%3$s" size="2"> %2$s</label><br/>', $name, $label, $value, SI_Settings_API::_sanitize_input_for_vue( $name ) );
+			printf( '<div class="si_input_field_wrap si_field_wrap_input_select si_form_int"><label>%2$s</label><input v-model="vm.si_invoice_sub_mapping_%4$s" type="text" name="si_invoice_sub_mapping_%1$s" id="si_invoice_sub_mapping_%1$s" value="%3$s"></div><br/>', $name, $label, $value, SI_Settings_API::_sanitize_input_for_vue( $name ) );
 		}
 
 		printf( '<p class="description">%s</p>', __( 'Map the field IDs of your form to the data name.', 'sprout-invoices' ) );

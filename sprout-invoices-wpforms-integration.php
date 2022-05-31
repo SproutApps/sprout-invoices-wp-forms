@@ -14,8 +14,15 @@
 /**
  * Plugin Info for updates
  */
-define( 'SA_ADDON_INVOICE_SUBMISSIONS_FILE', __FILE__ );
-define( 'SA_ADDON_INVOICE_SUBMISSIONS_URL', plugins_url( '', __FILE__ ) );
+if ( ! defined('SA_ADDON_INVOICE_SUBMISSIONS_FILE') ) {
+	define( 'SA_ADDON_INVOICE_SUBMISSIONS_FILE', __FILE__ );
+}
+if ( ! defined('SA_ADDON_INVOICE_SUBMISSIONS_URL') ) {
+	define( 'SA_ADDON_INVOICE_SUBMISSIONS_URL', plugins_url( '', __FILE__ ) );
+}
+
+// Plugin File
+define( 'SI_WP_FORMS_PLUGIN_FILE', __FILE__ );
 
 if ( ! function_exists( 'sa_load_wpforms_integration_addon' ) ) {
 
