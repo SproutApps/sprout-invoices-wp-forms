@@ -4,7 +4,7 @@ Donate link: https://sproutapps.co/
 Tags: invoice, invoicing, billing, estimates, wp forms, billings, paypal, online payment
 Requires at least: 4.8
 Tested up to: 5.0
-Stable tag: 1.3.2
+Stable tag: 2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,7 +25,7 @@ Sprout Invoices allows you to create beautiful estimates and invoices for your c
 
 Even though our goal is to make getting paid easy, providing fast and reliable support is a priority. We don't want any user to feel alone.
 
-Trust the <a href="https://wordpress.org/support/plugin/sprout-invoices/reviews/?filter=5" rel="friend" title="Sprout Invoices WordPress.org Reviews">reviews</a> and join an <a href="https://sproutinvoices.com/reviews/?utm_medium=link&utm_campaign=free&utm_source=wordpress.org" rel="friend" title="Sprout Invoices Reviews">awesome community</a> of happy users.   
+Trust the <a href="https://wordpress.org/support/plugin/sprout-invoices/reviews/?filter=5" rel="friend" title="Sprout Invoices WordPress.org Reviews">reviews</a> and join an <a href="https://sproutinvoices.com/reviews/?utm_medium=link&utm_campaign=free&utm_source=wordpress.org" rel="friend" title="Sprout Invoices Reviews">awesome community</a> of happy users.
 
 > <strong>Sprout Invoices Pro</strong><br />
 > This plugin is the lite version of the Sprout Invoices Pro plugin that comes with all the invoicing features you will ever need including recurring invoices, recurring payments, pre-defined line items, client dashboards, Stripe and many other payment processors, advanced reporting, hundreds of integrations (including Zapier) and a ton more. <a href="https://sproutinvoices.com?utm_medium=link&utm_campaign=free&utm_source=wordpress.org" rel="friend" title="Sprout Invoices">Click here to learn more about the best Invoicing plugin for WordPress now!</a>
@@ -47,6 +47,10 @@ Trust the <a href="https://wordpress.org/support/plugin/sprout-invoices/reviews/
 1. Settings overview
 
 == Changelog ==
+
+= 2.0 =
+* **Update:** Added settings link on plugin page.
+* **Fix:** Updated HTML for settings page to integrate with Sprout Invoices 20.0
 
 = 1.0.1 =
 
